@@ -12,7 +12,7 @@
 #' @export
 #' @importFrom magrittr %>%
 #' @examples
-getData <- function(hashtag, n, filename, ...) {
+getData <- function(query, n, filename, ...) {
   logger::log_threshold(logger::INFO)
 
   logger::log_info("Loading API keys and previous data")
@@ -34,9 +34,9 @@ getData <- function(hashtag, n, filename, ...) {
     access_secret = secrets["ACCESS_SECRET"]
   )
 
-  logger::log_info("Getting latest tweets for {hashtag}")
+  logger::log_info("Getting latest tweets for {query}")
 
-  latest_3000 <- rtweet::search_tweets(hashtag,
+  latest_3000 <- rtweet::get_timelines(query,
                                        n = n, ...) %>%
     rtweet::flatten()
 

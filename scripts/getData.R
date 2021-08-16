@@ -2,9 +2,10 @@ library(magrittr)
 devtools::load_all()
 #### Function call ####
 
-getData("#rstats",
+handles <- readr::read_csv("data/handles.csv")
+
+getData(handles$handle,
         5000,
         "data/tweets.csv.gz",
-        include_rts = FALSE,
         retryonratelimit = TRUE)
 
