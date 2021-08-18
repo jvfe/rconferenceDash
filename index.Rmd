@@ -12,9 +12,11 @@ output:
 ```{r load_packages, include=FALSE}
 devtools::load_all()
 library(flexdashboard)
+library(lubridate)
 library(rtweet)
 library(vroom)
 library(dplyr)
+library(DT)
 ```
 
 ```{r load_data, include=FALSE, cache=TRUE}
@@ -38,6 +40,14 @@ n_likes <- rstats_tweets %>%
 
 tweets_today <- rstats_tweets %>%
   filter(lubridate::date(created_at) == lubridate::today())
+
+tweets_month <- rstats_tweets %>%
+  filter(date(created_at) %within% interval(floor_date(today(), "month"), today()))
+
+if (nrow(tweets_today) == 0) {
+  tweets_today <- rstats_tweets %>%
+    filter(lubridate::date(created_at) == max(lubridate::date(created_at)))
+}
 
 top_tweets <- rstats_tweets %>%
   filter(is_retweet == FALSE) %>% 
@@ -135,4 +145,52 @@ Row
 ```{r}
 top_tweets_html <- purrr::pmap_chr(list(top_tweets$screen_name, top_tweets$status_id), get_tweet_embed)
 htmltools::HTML(stringr::str_glue("{top_tweets_html}"))
+```
+
+Data {data-icon="ion-stats-bars" data-orientation=column}
+==============
+
+Column {data-height=1000}
+----------------------------------------------------------
+
+### Tweets this month {.datatable-container}
+
+```{r datatable}
+tweets_month %>%
+  select(
+    status_url,
+    created_at,
+    screen_name,
+    text,
+    retweet_count,
+    favorite_count,
+    mentions_screen_name
+  ) %>%
+  mutate(
+    status_url = stringr::str_glue("<a href=\"{status_url}\" target=\"_blank\">On Twitter</a>")
+  ) %>%
+  datatable(
+    .,
+    extensions = "Buttons",
+    rownames = FALSE,
+    escape = FALSE,
+    colnames = c("Timestamp", "User", "Tweet", "RT", "Fav", "Mentioned"),
+    filter = 'top',
+    options = list(
+      columnDefs = list(list(
+        targets = 0, searchable = FALSE
+      )),
+      lengthMenu = c(5, 10, 25, 50, 100),
+      pageLength = 10,
+      scrollY = 600,
+      scroller = TRUE,
+      dom = '<"d-flex justify-content-between"lBf>rtip',
+      buttons = list('copy', list(
+        extend = 'collection',
+        buttons = c('csv', 'excel'),
+        text = 'Download'
+      ))
+    ),
+    class = "top-tbl"
+  )
 ```
