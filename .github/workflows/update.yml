@@ -41,23 +41,6 @@ jobs:
           pak::local_install_dev_deps(upgrade = TRUE, ask = FALSE)
         shell: Rscript {0}
 
-      - name: Get data
-        env:
-          TWITTER_KEY: ${{ secrets.TWITTER_KEY }}
-          TWITTER_SECRET: ${{ secrets.TWITTER_SECRET }}
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          ACCESS_SECRET: ${{ secrets.ACCESS_SECRET }}
-        run: |
-          Rscript ./scripts/getData.R
-      - name: Configure git
-        run: |
-          git config --local user.email "actions@github.com"
-          git config --local user.name "GitHub Actions"
-      - name: Update data
-        run: |
-          git add ./data/
-          git commit -m "chore: Update tweet data" || echo "Failed on commit data"
-          git push || echo "Failed on push data"
       - name: Render dashboard
         run: |
           rmarkdown::render('./index.Rmd')

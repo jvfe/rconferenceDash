@@ -4,9 +4,9 @@ output:
   flexdashboard::flex_dashboard:
     orientation: rows
     vertical_layout: scroll
-    css: styles/main.css
     includes:
       after_body: fragments/footer.html
+    css: styles/main.css
 ---
 
 ```{r load_packages, include=FALSE}
@@ -20,7 +20,8 @@ library(DT)
 ```
 
 ```{r load_data, include=FALSE, cache=TRUE}
-rstats_tweets <- readData("data/tweets.csv.gz")
+data_url <- "https://github.com/jvfe/rconferenceData/raw/main/data/tweets.csv.gz"
+rstats_tweets <- readData(data_url)
 ```
 
 ```{r process_data, include=FALSE, cache=TRUE}
@@ -147,10 +148,7 @@ top_tweets_html <- purrr::pmap_chr(list(top_tweets$screen_name, top_tweets$statu
 htmltools::HTML(stringr::str_glue("{top_tweets_html}"))
 ```
 
-Data {data-icon="ion-stats-bars" data-orientation=column}
-==============
-
-Column {data-height=1000}
+Row {data-width=100}
 ----------------------------------------------------------
 
 ### Tweets this month {.datatable-container}
